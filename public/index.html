@@ -206,27 +206,280 @@
             white-space: nowrap
         }
 
-        @media(max-width:700px) {
-            .table-wrap {
-                overflow-x: auto
+
+        /* Global overflow and sizing safeguards */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: clip;
+        }
+
+        img, svg, video, canvas {
+            max-width: 100%;
+        }
+
+        button, input, select, textarea {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .page-shell, .header-inner, main, section, .card {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        @media (max-width: 700px) {
+            .header-inner {
+                padding: 14px 16px !important;
+                flex-wrap: wrap;
+                gap: 12px;
             }
 
-            table {
-                min-width: 780px
+            .header-inner > div:last-child {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            #newTicketBtn {
+                min-height: 44px;
+                padding: 10px 14px;
             }
 
             .page-shell {
-                padding-left: 16px !important;
-                padding-right: 16px !important
+                padding: 22px 12px !important;
+            }
+
+            #greetingTitle {
+                font-size: clamp(23px, 6vw, 30px);
+                line-height: 1.2;
+                overflow-wrap: anywhere;
+            }
+
+            [role="tablist"] {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                width: 100%;
+            }
+
+            [role="tablist"] button {
+                min-height: 44px;
+                width: 100%;
             }
 
             .stat-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr))
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 10px !important;
             }
 
-            .header-inner {
-                padding-left: 16px !important;
-                padding-right: 16px !important
+            .stat-grid > * {
+                min-width: 0;
+                padding: 14px !important;
+                overflow-wrap: anywhere;
+            }
+
+            #dashboardPanel .card {
+                border-radius: 14px;
+            }
+
+            #dashboardPanel .card > div:first-child {
+                padding: 16px !important;
+            }
+
+            #dashboardPanel .card > div:first-child > div:last-child {
+                width: 100%;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            #dashboardPanel .card > div:first-child > div:last-child > * {
+                width: 100% !important;
+            }
+
+            /* Tables become stacked ticket cards on phones */
+            .table-wrap,
+            #managePanel .overflow-x-auto {
+                overflow: visible !important;
+                width: 100%;
+            }
+
+            .table-wrap table,
+            #managePanel table {
+                display: block;
+                width: 100% !important;
+                min-width: 0 !important;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .table-wrap table thead,
+            #managePanel table thead {
+                display: none;
+            }
+
+            .table-wrap table tbody,
+            #managePanel table tbody {
+                display: block;
+                width: 100%;
+            }
+
+            #ticketList tr,
+            #manageTicketRows tr {
+                display: block;
+                width: 100%;
+                padding: 12px 14px;
+                margin: 0;
+                border-bottom: 1px solid var(--line);
+                background: #fff;
+            }
+
+            #ticketList td,
+            #manageTicketRows td {
+                display: grid;
+                grid-template-columns: minmax(82px, 34%) minmax(0, 1fr);
+                align-items: start;
+                gap: 10px;
+                width: 100%;
+                padding: 7px 0 !important;
+                text-align: left !important;
+                white-space: normal !important;
+                overflow-wrap: anywhere;
+                border: 0;
+            }
+
+            #ticketList td::before,
+            #manageTicketRows td::before {
+                color: #778197;
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: .06em;
+                text-transform: uppercase;
+                content: "";
+            }
+
+            #ticketList td:nth-child(1)::before { content: "Ticket ID"; }
+            #ticketList td:nth-child(2)::before { content: "Customer"; }
+            #ticketList td:nth-child(3)::before { content: "Subject"; }
+            #ticketList td:nth-child(4)::before { content: "Priority"; }
+            #ticketList td:nth-child(5)::before { content: "Status"; }
+            #ticketList td:nth-child(6)::before { content: "Created"; }
+            #ticketList td:nth-child(7)::before { content: "Action"; }
+
+            #manageTicketRows td:nth-child(1)::before { content: "Ticket"; }
+            #manageTicketRows td:nth-child(2)::before { content: "Customer"; }
+            #manageTicketRows td:nth-child(3)::before { content: "Subject"; }
+            #manageTicketRows td:nth-child(4)::before { content: "Status"; }
+            #manageTicketRows td:nth-child(5)::before { content: "Priority"; }
+            #manageTicketRows td:nth-child(6)::before { content: "Action"; }
+
+            #ticketList td:last-child,
+            #manageTicketRows td:last-child {
+                padding-top: 10px !important;
+            }
+
+            #ticketList td button,
+            #manageTicketRows td button {
+                justify-self: start;
+                min-height: 38px;
+            }
+
+            #managePanel .card {
+                padding: 16px !important;
+            }
+
+            #managePanel .card > div:first-child {
+                align-items: stretch;
+            }
+
+            #manageRefresh {
+                width: 100%;
+                min-height: 42px;
+            }
+
+            #pager {
+                flex-wrap: wrap;
+                padding: 14px !important;
+            }
+
+            #pager > span,
+            #pager > div {
+                width: 100%;
+            }
+
+            #pager button {
+                flex: 1;
+                min-height: 40px;
+            }
+
+            .modal-backdrop {
+                align-items: flex-start !important;
+                justify-content: center !important;
+                padding: 12px !important;
+                overflow-y: auto;
+            }
+
+            .modal-panel {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: calc(100dvh - 24px) !important;
+                margin: auto 0;
+                padding: 20px !important;
+                border-radius: 16px;
+            }
+
+            .modal-panel .grid-cols-\[90px_1fr\] {
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 5px !important;
+            }
+
+            #detailPriority {
+                min-width: 0;
+            }
+
+            #updateStatusBtn {
+                flex-shrink: 0;
+            }
+
+            #addNoteForm {
+                flex-direction: column;
+            }
+
+            #addNoteForm button {
+                min-height: 42px;
+                width: 100%;
+            }
+
+            #newTicketForm .flex.justify-end {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            #newTicketForm .flex.justify-end button {
+                min-height: 42px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            #toast {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .stat-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+
+            #ticketList td,
+            #manageTicketRows td {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 4px;
+            }
+
+            .modal-panel {
+                padding: 16px !important;
             }
         }
     </style>
