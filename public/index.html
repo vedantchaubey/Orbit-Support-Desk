@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101827">
+    <meta name="description" content="Customer support ticket management dashboard">
+    <title>Orbit | Support Desk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #778197;
+            --line: #e8ebf1;
+            --canvas: #f5f7fb;
+            --teal: #0e9f91;
+            --navy: #111a2b
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--canvas);
+            color: var(--ink);
+            font-family: 'DM Sans', sans-serif;
+            -webkit-font-smoothing: antialiased
+        }
+
+        .display {
+            font-family: Manrope, sans-serif
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 3px 12px rgba(20, 32, 55, .025)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 999px;
+            white-space: nowrap
+        }
+
+        .badge:before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor
+        }
+
+        .status-open {
+            background: #fff6e9;
+            color: #b76a11
+        }
+
+        .status-in-progress {
+            background: #eaf2ff;
+            color: #3568c8
+        }
+
+        .status-closed {
+            background: #e8f8f2;
+            color: #16805e
+        }
+
+        .pri-low {
+            background: #f1f3f7;
+            color: #657087
+        }
+
+        .pri-medium {
+            background: #f1edff;
+            color: #7454c5
+        }
+
+        .pri-high {
+            background: #fff0ef;
+            color: #c14e48
+        }
+
+        .pri-urgent {
+            background: #c83e48;
+            color: white
+        }
+
+        .pri-urgent:before {
+            background: white
+        }
+
+        .avatar {
+            height: 36px;
+            width: 36px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: #e8f2f4;
+            color: #277a7b;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0
+        }
+
+        .row-hover {
+            transition: background .15s
+        }
+
+        .row-hover:hover {
+            background: #f8fafc
+        }
+
+        .field {
+            width: 100%;
+            border: 1px solid #e1e5ed;
+            background: #fff;
+            border-radius: 11px;
+            padding: 11px 13px;
+            font: inherit;
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            transition: border .15s, box-shadow .15s
+        }
+
+        .field:focus {
+            border-color: #53b9ae;
+            box-shadow: 0 0 0 3px rgba(14, 159, 145, .12)
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: #fff;
+            border-radius: 11px;
+            padding: 11px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(14, 159, 145, .16);
+            transition: transform .15s, background .15s
+        }
+
+        .btn-primary:hover {
+            background: #0b8d81;
+            transform: translateY(-1px)
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--line);
+            background: white;
+            border-radius: 10px;
+            padding: 9px 13px;
+            font-size: 13px;
+            font-weight: 600
+        }
+
+        .modal-backdrop {
+            background: rgba(13, 22, 38, .56);
+            backdrop-filter: blur(5px)
+        }
+
+        .modal-panel {
+            animation: rise .18s ease-out;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .2)
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(.99)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .toast {
+            transition: opacity .2s, transform .2s
+        }
+
+        #ticketList tr {
+            border-bottom: 1px solid #f0f2f6
+        }
+
+        #ticketList tr:last-child {
+            border-bottom: 0
+        }
+
+        th {
+            white-space: nowrap
+        }
+
+        @media(max-width:700px) {
+            .table-wrap {
+                overflow-x: auto
+            }
+
+            table {
+                min-width: 780px
+            }
+
+            .page-shell {
+                padding-left: 16px !important;
+                padding-right: 16px !important
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+
+            .header-inner {
+                padding-left: 16px !important;
+                padding-right: 16px !important
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <header class="bg-[#111a2b] text-white">
+        <div class="header-inner max-w-7xl mx-auto px-7 py-5 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div
+                    class="h-11 w-11 rounded-2xl bg-teal-400/15 border border-teal-300/20 grid place-items-center text-teal-300">
+                    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 13a8 8 0 0 1 16 0v5a2 2 0 0 1-2 2h-2v-7h4M4 13v5a2 2 0 0 0 2 2h2v-7H4" />
+                        <path d="M9 20h6" />
+                    </svg></div>
+                <div>
+                    <div class="display text-lg font-extrabold tracking-tight">Orbit<span class="text-teal-300">.</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mt-0.5">Customer support workspace</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3"><span
+                    class="hidden sm:flex items-center gap-2 text-xs text-slate-300"><span
+                        class="w-2 h-2 rounded-full bg-emerald-400"></span> System operational</span><button
+                    id="newTicketBtn" class="btn-primary flex items-center gap-2"><span
+                        class="text-lg leading-none">+</span> New ticket</button></div>
+        </div>
+    </header>
+    <main class="page-shell max-w-7xl mx-auto px-7 py-9">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-7">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[.16em] text-teal-700 mb-2">Support overview</p>
+                <h1 class="display text-3xl font-extrabold tracking-tight" id="greetingTitle">
+                   Good evening, Support Team
+                 </h1>
+                <p class="text-sm text-slate-500 mt-2">Track, triage, and resolve customer requests in one place.</p>
+            </div>
+            <div class="text-xs text-slate-400" id="lastUpdated">Live ticket data</div>
+        </div>
+        <div class="flex gap-2 mb-6" role="tablist" aria-label="Workspace sections">
+            <button id="dashboardTab" class="btn-primary" role="tab" aria-selected="true">Dashboard</button>
+            <button id="manageTab" class="btn-secondary" role="tab" aria-selected="false">Manage</button>
+        </div>
+        <section id="managePanel" class="hidden space-y-6 mb-7">
+            <div class="card p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5"><div><p class="text-xs font-bold uppercase tracking-widest text-teal-700">Workspace administration</p><h2 class="display text-xl font-extrabold mt-1">Manage tickets</h2><p class="text-sm text-slate-500 mt-1">Review tickets and open any record to update status, priority, or internal notes.</p></div><button id="manageRefresh" class="btn-secondary">Refresh tickets</button></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-400"><tr><th class="p-3">Ticket</th><th class="p-3">Customer</th><th class="p-3">Subject</th><th class="p-3">Status</th><th class="p-3">Priority</th><th class="p-3">Action</th></tr></thead><tbody id="manageTicketRows"></tbody></table></div>
+            </div>
+        </section>
+        <div id="dashboardPanel"><section id="statsBar" class="stat-grid grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7"></section>
+        <section class="card overflow-hidden">
+            <div class="px-5 sm:px-7 pt-6 pb-5 border-b border-slate-100">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="display font-bold text-lg">All tickets</h2>
+                        <p class="text-xs text-slate-500 mt-1">Search and filter incoming customer requests.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                        <div class="relative flex-1 lg:w-72"><svg class="absolute left-3 top-3 text-slate-400"
+                                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="11" cy="11" r="7" />
+                                <path d="m20 20-4-4" />
+                            </svg><input id="searchInput" class="field pl-9" placeholder="Search tickets, customers..."
+                                aria-label="Search tickets"></div><select id="statusFilter" class="field sm:w-40"
+                            aria-label="Filter by status">
+                            <option value="">All statuses</option>
+                            <option>Open</option>
+                            <option>In Progress</option>
+                            <option>Closed</option>
+                        </select><select id="priorityFilter" class="field sm:w-40" aria-label="Filter by priority">
+                            <option value="">All priorities</option>
+                            <option>Urgent</option>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-[#fafbfe] text-[10px] uppercase tracking-[.12em] text-slate-400">
+                        <tr>
+                            <th class="px-6 py-4 font-bold">Ticket ID</th>
+                            <th class="px-4 py-4 font-bold">Customer</th>
+                            <th class="px-4 py-4 font-bold">Subject</th>
+                            <th class="px-4 py-4 font-bold">Priority</th>
+                            <th class="px-4 py-4 font-bold">Status</th>
+                            <th class="px-6 py-4 font-bold">Created</th>
+                            <th class="px-6 py-4 font-bold text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketList"></tbody>
+                </table>
+            </div>
+            <div id="loadingState" class="text-center text-slate-400 text-sm py-14">Loading your tickets...</div>
+            <div id="emptyState" class="hidden text-center py-16">
+                <div
+                    class="mx-auto mb-3 w-12 h-12 rounded-2xl bg-slate-100 grid place-items-center text-slate-400 text-xl">
+                    ⌕</div>
+                <p class="font-bold text-slate-700">No tickets found</p>
+                <p class="text-sm text-slate-400 mt-1">Try changing your search or create a new ticket.</p>
+            </div>
+            <div id="pager"
+                class="hidden items-center justify-between gap-3 px-5 sm:px-7 py-4 border-t border-slate-100 text-xs text-slate-500">
+                <span id="pagerLabel"></span>
+                <div class="flex gap-2"><button id="prevPage"
+                        class="btn-secondary disabled:opacity-40">Previous</button><button id="nextPage"
+                        class="btn-secondary disabled:opacity-40">Next</button></div>
+            </div>
+        </section>
+        <p class="text-center text-[11px] text-slate-400 mt-6">Orbit Support Desk · Keep every customer conversation moving.</p></div>
+    </main>
+    <div id="newTicketModal" class="hidden modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div class="modal-panel bg-white rounded-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <p class="text-xs uppercase tracking-widest font-bold text-teal-700 mb-2">Create request</p>
+                    <h2 class="display text-xl font-extrabold">New support ticket</h2>
+                    <p class="text-sm text-slate-500 mt-1">Capture the issue and route it to your team.</p>
+                </div><button type="button" id="cancelNewTicket" aria-label="Close"
+                    class="text-slate-400 hover:text-slate-800 text-2xl">×</button>
+            </div>
+            <form id="newTicketForm" class="space-y-4">
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Customer name *</label><input required
+                        name="customer_name" class="field" placeholder="e.g. Aisha Khan"></div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Customer email *</label><input
+                        required type="email" name="customer_email" class="field" placeholder="name@company.com"></div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Issue title *</label><input required
+                        name="subject" maxlength="180" class="field" placeholder="Summarize the issue"></div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Priority</label><select
+                        name="priority" class="field">
+                        <option>Low</option>
+                        <option selected>Medium</option>
+                        <option>High</option>
+                        <option>Urgent</option>
+                    </select></div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Description</label><textarea
+                        name="description" rows="4" class="field resize-none"
+                        placeholder="Add details that will help the team resolve this..."></textarea></div>
+                <div class="flex justify-end gap-2 pt-3"><button type="button" id="cancelNewTicket2"
+                        class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Create ticket
+                        <span class="ml-1">→</span></button></div>
+            </form>
+        </div>
+    </div>
+    <div id="detailModal" class="hidden modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div class="modal-panel bg-white rounded-2xl w-full max-w-xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <p id="detailTicketId" class="text-xs font-mono font-bold text-teal-700 mb-2"></p>
+                    <h2 id="detailSubject" class="display text-xl font-extrabold break-words"></h2>
+                </div><button id="closeDetail" aria-label="Close"
+                    class="text-slate-400 hover:text-slate-800 text-2xl">×</button>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-100 p-4 space-y-3 text-sm mb-6">
+                <div class="grid grid-cols-[90px_1fr] gap-2"><span class="text-slate-400">Customer</span><span
+                        id="detailCustomer" class="font-semibold break-words"></span></div>
+                <div class="grid grid-cols-[90px_1fr] gap-2"><span class="text-slate-400">Email</span><span
+                        id="detailEmail" class="break-all"></span></div>
+                <div class="grid grid-cols-[90px_1fr] gap-2"><span class="text-slate-400">Description</span><span
+                        id="detailDescription" class="whitespace-pre-wrap break-words"></span></div>
+                <div class="grid grid-cols-[90px_1fr] gap-2 items-center"><label for="detailStatus"
+                        class="text-slate-400">Status</label><select id="detailStatus" class="field"></select></div>
+                <div class="grid grid-cols-[90px_1fr] gap-2 items-center"><label for="detailPriority"
+                        class="text-slate-400">Priority</label>
+                    <div class="flex gap-2"><select id="detailPriority" class="field"></select><button
+                            id="updateStatusBtn" class="btn-primary">Save</button></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="display font-bold">Internal notes</h3><span class="text-xs text-slate-400">Team
+                        only</span>
+                </div>
+                <div id="notesList" class="space-y-2 mb-4 text-sm"></div>
+                <form id="addNoteForm" class="flex gap-2"><input name="note" required maxlength="2000"
+                        placeholder="Write an internal note..." class="field"><button class="btn-primary">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="toast" role="status" aria-live="polite"
+        class="toast hidden fixed bottom-5 right-5 bg-[#111a2b] text-white text-sm px-5 py-3 rounded-xl shadow-xl z-[60]">
+    </div>
+    <script src="app.js"></script>
+    <script>
+  function updateGreeting() {
+    const hour = new Date().getHours();
+
+    let greeting;
+
+    if (hour >= 5 && hour < 12) {
+      greeting = "Good morning";
+    } else if (hour >= 12 && hour < 17) {
+      greeting = "Good afternoon";
+    } else if (hour >= 17 && hour < 21) {
+      greeting = "Good evening";
+    } else {
+      greeting = "Welcome back";
+    }
+
+    document.getElementById("greetingTitle").textContent =
+      `${greeting}, support team`;
+  }
+
+  updateGreeting();
+</script>
+</body>
+
+</html>
